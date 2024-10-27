@@ -1,17 +1,9 @@
 import { createDartGame } from '@/calculate-solution'
 import { cn } from '@/lib/utils'
+import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import { Button } from './ui/button'
-import { Input } from './ui/input'
-import {
-	Sheet,
-	SheetContent,
-	SheetDescription,
-	SheetHeader,
-	SheetTitle,
-	SheetTrigger,
-} from './ui/sheet'
-import { useOfflineDartGame } from './useOfflineDartGame'
+import { Button, buttonVariants } from '../../components/ui/button'
+import { useDartGame } from '../store/useDartGame'
 
 type SectionType = 'single' | 'double' | 'triple'
 type HoveredSection =
@@ -172,71 +164,25 @@ const getDartPoint = (point: string) => {
 	return 0
 }
 
-type Game = {
-	players: { name: string }[]
-	currentRound: number
-	currentPlayerIndex: number
-	rounds: {
-		round: number
-		overview: {
-			players: {
-				name: string
-				roundScore: number
-				score: number
-				darts: { x: number; y: number; type: SectionType; points: number }[]
-			}[]
-		}
-	}[]
-}
-
-const startingPoints = 120
 const dartGame = createDartGame()
-const dartsPerRound = 3
 
 const DartBoard = () => {
 	const [hoveredSection, setHoveredSection] = useState<HoveredSection>(null)
-	const [darts, setDarts] = useState<
-		{ x: number; y: number; type: SectionType; points: number }[]
-	>([])
-	const roundScore = darts.reduce((acc, curr) => {
-		return acc + curr.points
-	}, 0)
+	const g = useDartGame()
 
-	const d = useOfflineDartGame()
-	console.log('query', d.query)
-
-	const [game, setGame] = useState<Game>({
-		players: [{ name: 'Adam' }, { name: 'Lukas' }],
-		currentRound: 0,
-		currentPlayerIndex: 0,
-		rounds: [],
-	})
-	const currentPlayer = d.data?.players[game.currentPlayerIndex]
-
-	const getTotalScore = (name: string) => {
-		const latestScore = game.rounds
-			.map((round) =>
-				round.overview.players.find((player) => player.name === name),
-			)
-			.reverse()
-			.filter(Boolean)
-
-		console.log('latestScore', latestScore)
-
-		return latestScore[0]?.score ?? startingPoints
-	}
-
-	const remainingDarts = dartsPerRound - darts.length
-
+	const remainingDarts = g.dartsPerRound - g.darts.length
 	const dartsLeftContent =
-		darts.length >= 1
-			? dartGame.getWinningThrows(startingPoints - roundScore, remainingDarts)
+		g.darts.length >= 1
+			? dartGame.getWinningThrows(
+					g.pointsToWin - g.currentPlayerRoundScore,
+					remainingDarts,
+				)
 			: null
 
 	const handleClick = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
 		e.preventDefault()
 
-		if (darts.length === 3) {
+		if (g.darts.length === 3) {
 			console.log('no more darts friend')
 			return
 		}
@@ -261,153 +207,42 @@ const DartBoard = () => {
 
 			const points = getDartPoint(dataPoint)
 
-			setDarts((prev) => [
-				...prev,
-				{ x, y, type: dataPoint as SectionType, points },
-			])
+			g.saveDart({
+				x,
+				y,
+				points,
+				type: dataPoint as SectionType,
+			})
 		}
 	}
 
-	const removeDart = (x: number, y: number) => {
-		setDarts((prev) => prev.filter((dart) => dart.x !== x && dart.y !== y))
-	}
+	const nextPlayer = () => {
+		const next = g.currentPlayerIndex + 1
 
-	const addPlayer = (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault()
-
-		d.addPlayer()
-
-		const formData = new FormData(e.currentTarget)
-		const addPlayerName = formData.get('add-player')?.toString()
-
-		if (!addPlayerName) {
-			console.error('no value friend')
-			return
-		}
-
-		const hasPlayerWithSameName = game.players.some(
-			(player) => player.name === addPlayerName,
-		)
-
-		if (hasPlayerWithSameName) {
-			console.error('Name exists')
-			return
-		}
-
-		setGame((prev) => {
-			return { ...prev, players: [...prev.players, { name: addPlayerName }] }
-		})
-
-		e.currentTarget.reset()
-	}
-
-	const removePlayer = (name: string) => {
-		setGame((prev) => {
-			return {
-				...prev,
-				players: prev.players.filter((player) => player.name !== name),
-			}
-		})
-	}
-
-	const addPlayerRound = (name: string, proceedToNextRound = false) => {
-		const previousPlayers =
-			game.rounds.find(({ round }) => round === game.currentRound)?.overview
-				.players || []
-		const rounds = game.rounds.filter(
-			({ round }) => round !== game.currentRound,
-		)
-		rounds.push({
-			round: game.currentRound,
-			overview: {
-				players: [
-					...previousPlayers,
-					{
-						name,
-						darts,
-						roundScore,
-						score: getTotalScore(name) - roundScore,
-					},
-				],
-			},
-		})
-
-		setGame((prev) => ({
-			...prev,
-			currentPlayerIndex: proceedToNextRound ? 0 : prev.currentPlayerIndex + 1,
-			currentRound: proceedToNextRound
-				? prev.currentRound + 1
-				: prev.currentRound,
-			rounds,
-		}))
-	}
-
-	const nextPlayer = (name: string) => {
-		const next = game.currentPlayerIndex + 1
-
-		if (next === game.players.length) {
+		if (next === g.players.length) {
 			console.error('No more players')
 			return
 		}
 
-		addPlayerRound(name)
-		setDarts([])
+		g.savePlayerRound()
+		g.nextPlayer()
 	}
 
-	const nextRound = (name: string) => {
-		addPlayerRound(name, true)
-		setDarts([])
+	const nextRound = () => {
+		g.savePlayerRound()
+		g.nextRound()
 	}
 
 	return (
 		<div className="w-full max-w-2xl mx-auto relative">
 			<h1 className="font-bold text-2xl text-center">
-				Round {game.currentRound}
+				Round {g.currentRound + 1}
 			</h1>
 			<h2 className="font-bold text-xl mb-6 mt-4">
-				Current player: {currentPlayer.name} |{' '}
-				{getTotalScore(currentPlayer.name) - roundScore} points
+				Current player: {g.currentPlayer().name} |{' '}
+				{g.currentPlayerScore() - g.currentPlayerRoundScore} points
 			</h2>
-			<Sheet>
-				<SheetTrigger asChild>
-					<Button type="button" variant="outline">
-						Players
-					</Button>
-				</SheetTrigger>
-				<SheetContent side="right">
-					<SheetHeader>
-						<SheetTitle>Players</SheetTitle>
-						<SheetDescription>Add remove players</SheetDescription>
-					</SheetHeader>
-					<div className="mt-6">
-						<div className="mb-4 flex flex-wrap gap-1">
-							{game.players.map((player) => (
-								<div key={player.name}>
-									<Button
-										variant="ghost"
-										className="hover:line-through"
-										onClick={() => removePlayer(player.name)}
-									>
-										<p>
-											{player.name}, {getTotalScore(player.name)}
-										</p>
-									</Button>
-								</div>
-							))}
-						</div>
-
-						<form
-							onSubmit={addPlayer}
-							className="grid grid-cols-1 items-center gap-2"
-						>
-							<div className="flex items-center gap-2">
-								<Input id="add-player" name="add-player" placeholder="Steffe" />
-								<Button type="submit">Add player</Button>
-							</div>
-						</form>
-					</div>
-				</SheetContent>
-			</Sheet>
+			<p></p>
 
 			<svg viewBox="0 0 500 500" id="svg" onClick={handleClick}>
 				{/* Outer black ring */}
@@ -475,9 +310,9 @@ const DartBoard = () => {
 					onMouseLeave={() => setHoveredSection(null)}
 				/>
 
-				{darts.length > 0 && (
+				{g.darts.length > 0 && (
 					<g id="darts">
-						{darts.map((dart, index) => (
+						{g.darts.map((dart, index) => (
 							<circle
 								key={index}
 								data-type="dart"
@@ -486,7 +321,7 @@ const DartBoard = () => {
 								r="3"
 								stroke="0.5"
 								className="fill-white stroke-pink-600 cursor-pointer hover:fill-pink-600 hover:stroke-white"
-								onClick={() => removeDart(dart.x, dart.y)}
+								onClick={() => g.removeDart(dart.x, dart.y)}
 							/>
 						))}
 					</g>
@@ -496,23 +331,51 @@ const DartBoard = () => {
 			<div className="flex gap-4 mt-8 justify-center">
 				<Button
 					type="button"
-					onClick={() => nextPlayer(currentPlayer.name)}
+					onClick={() => nextPlayer()}
 					disabled={
-						darts.length !== dartsPerRound ||
-						game.currentPlayerIndex === game.players.length - 1
+						g.darts.length !== g.dartsPerRound ||
+						g.currentPlayerIndex === g.players.length - 1
 					}
 				>
 					Next player
 				</Button>
 				<Button
 					type="button"
-					onClick={() => nextRound(currentPlayer.name)}
+					onClick={() => nextRound()}
 					disabled={
-						darts.length !== dartsPerRound ||
-						game.currentPlayerIndex < game.players.length - 1
+						g.darts.length !== g.dartsPerRound ||
+						g.currentPlayerIndex < g.players.length - 1
 					}
 				>
 					Next round
+				</Button>
+				<Link
+					className={buttonVariants()}
+					to="."
+					search={{
+						playersSheet: true,
+					}}
+				>
+					Players
+				</Link>
+			</div>
+
+			<div className="mt-4 flex flex-wrap gap-2 justify-center">
+				<Button
+					type="button"
+					variant="destructive"
+					size="sm"
+					onClick={() => g.resetPlayers()}
+				>
+					Reset players
+				</Button>
+				<Button
+					type="button"
+					variant="destructive"
+					size="sm"
+					onClick={() => g.resetGame()}
+				>
+					Reset game
 				</Button>
 			</div>
 

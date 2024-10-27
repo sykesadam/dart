@@ -1,3 +1,4 @@
+import { DefaultCatchBoundary } from '@/components/default-catch-boundary'
 import { NotFound } from '@/components/not-found'
 import globalCss from '@/tailwind.css?url'
 import {
@@ -8,6 +9,7 @@ import {
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import { Body, Head, Html, Meta, Scripts } from '@tanstack/start'
 import * as React from 'react'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 export const Route = createRootRoute({
 	meta: () => [
@@ -23,6 +25,13 @@ export const Route = createRootRoute({
 		},
 	],
 	links: () => [{ rel: 'stylesheet', href: globalCss }],
+	errorComponent: (props) => {
+		return (
+			<RootDocument>
+				<DefaultCatchBoundary {...props} />
+			</RootDocument>
+		)
+	},
 	notFoundComponent: () => <NotFound />,
 	component: RootComponent,
 })
@@ -45,6 +54,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				{children}
 				<ScrollRestoration />
 				<TanStackRouterDevtools position="bottom-right" />
+				<ReactQueryDevtools buttonPosition="bottom-left" />
 				<Scripts />
 			</Body>
 		</Html>

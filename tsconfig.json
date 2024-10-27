@@ -1,8 +1,10 @@
 {
+	"include": ["**/*.ts", "**/*.tsx"],
 	"compilerOptions": {
 		"strict": true,
 		"jsx": "react-jsx",
 		"moduleResolution": "Bundler",
+		"lib": ["DOM", "DOM.Iterable", "ES2022"],
 		"module": "ESNext",
 		"target": "ES2022",
 		"skipLibCheck": true,
