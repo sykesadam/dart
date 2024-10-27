@@ -106,7 +106,7 @@ const formatSolution = (solution: Solution): string => {
 	return [...throws, `  Total: ${totalScore}`].join('\n')
 }
 
-const getWinningThrows = (targetScore: number, maxDarts: number = 2) => {
+export const getWinningThrows = (targetScore: number, maxDarts: number = 2) => {
 	const solutions = findSolutions(targetScore, maxDarts)
 
 	if (solutions.length === 0) {
@@ -125,11 +125,4 @@ const getWinningThrows = (targetScore: number, maxDarts: number = 2) => {
 	]
 
 	return output.join('\n')
-}
-
-export const createDartGame = (): DartGame => {
-	return {
-		findSolutions,
-		getWinningThrows,
-	}
 }

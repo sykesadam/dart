@@ -1,11 +1,11 @@
-import { createDartGame } from '@/calculate-solution'
+import { getWinningThrows } from '@/calculate-solution'
 import { cn } from '@/lib/utils'
 import { Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Button, buttonVariants } from '../../components/ui/button'
 import { useDartGame } from '../store/useDartGame'
+import { SectionType } from '../types'
 
-type SectionType = 'single' | 'double' | 'triple'
 type HoveredSection =
 	| `${SectionType}-${number}`
 	| 'doublebull'
@@ -164,17 +164,16 @@ const getDartPoint = (point: string) => {
 	return 0
 }
 
-const dartGame = createDartGame()
-
 const DartBoard = () => {
 	const [hoveredSection, setHoveredSection] = useState<HoveredSection>(null)
-	const g = useDartGame()
+	const dartBoard = useRef<SVGSVGElement | null>(null)
+	const game = useDartGame()
 
-	const remainingDarts = g.dartsPerRound - g.darts.length
+	const remainingDarts = game.dartsPerRound - game.darts.length
 	const dartsLeftContent =
-		g.darts.length >= 1
-			? dartGame.getWinningThrows(
-					g.pointsToWin - g.currentPlayerRoundScore,
+		game.darts.length >= 1
+			? getWinningThrows(
+					game.pointsToWin - game.currentPlayerRoundScore,
 					remainingDarts,
 				)
 			: null
@@ -182,8 +181,12 @@ const DartBoard = () => {
 	const handleClick = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
 		e.preventDefault()
 
-		if (g.darts.length === 3) {
+		if (game.darts.length === 3) {
+			e.stopPropagation()
 			console.log('no more darts friend')
+
+			dartBoard.current?.classList.add('[animation:tilt-n-move-shaking_200ms]')
+
 			return
 		}
 
@@ -207,7 +210,7 @@ const DartBoard = () => {
 
 			const points = getDartPoint(dataPoint)
 
-			g.saveDart({
+			game.saveDart({
 				x,
 				y,
 				points,
@@ -217,34 +220,58 @@ const DartBoard = () => {
 	}
 
 	const nextPlayer = () => {
-		const next = g.currentPlayerIndex + 1
+		const next = game.currentPlayerIndex + 1
 
-		if (next === g.players.length) {
+		if (next === game.players.length) {
 			console.error('No more players')
 			return
 		}
 
-		g.savePlayerRound()
-		g.nextPlayer()
+		game.savePlayerRound()
+		game.nextPlayer()
 	}
 
 	const nextRound = () => {
-		g.savePlayerRound()
-		g.nextRound()
+		game.savePlayerRound()
+		game.nextRound()
+	}
+
+	const onRemoveDart = (
+		e: React.MouseEvent<SVGCircleElement, MouseEvent>,
+		x: number,
+		y: number,
+	) => {
+		e.stopPropagation()
+
+		game.removeDart(x, y)
 	}
 
 	return (
 		<div className="w-full max-w-2xl mx-auto relative">
 			<h1 className="font-bold text-2xl text-center">
-				Round {g.currentRound + 1}
+				Round {game.currentRound + 1}
 			</h1>
+			<p className="text-center">First to 0 from {game.pointsToWin}</p>
 			<h2 className="font-bold text-xl mb-6 mt-4">
-				Current player: {g.currentPlayer().name} |{' '}
-				{g.currentPlayerScore() - g.currentPlayerRoundScore} points
+				Current player: {game.currentPlayer().name} |{' '}
+				{game.currentPlayerScore() - game.currentPlayerRoundScore} points
 			</h2>
-			<p></p>
+			<p>
+				Dart: {game.darts.length} / {game.dartsPerRound}
+			</p>
 
-			<svg viewBox="0 0 500 500" id="svg" onClick={handleClick}>
+			<svg
+				ref={dartBoard}
+				viewBox="0 0 500 500"
+				id="svg"
+				onClick={handleClick}
+				className="[animation-iteration-count:2]"
+				onAnimationEnd={() =>
+					dartBoard.current?.classList.remove(
+						'[animation:tilt-n-move-shaking_200ms]',
+					)
+				}
+			>
 				{/* Outer black ring */}
 				<circle
 					id="outer-ring"
@@ -310,9 +337,9 @@ const DartBoard = () => {
 					onMouseLeave={() => setHoveredSection(null)}
 				/>
 
-				{g.darts.length > 0 && (
+				{game.darts.length > 0 && (
 					<g id="darts">
-						{g.darts.map((dart, index) => (
+						{game.darts.map((dart, index) => (
 							<circle
 								key={index}
 								data-type="dart"
@@ -321,7 +348,7 @@ const DartBoard = () => {
 								r="3"
 								stroke="0.5"
 								className="fill-white stroke-pink-600 cursor-pointer hover:fill-pink-600 hover:stroke-white"
-								onClick={() => g.removeDart(dart.x, dart.y)}
+								onClick={(e) => onRemoveDart(e, dart.x, dart.y)}
 							/>
 						))}
 					</g>
@@ -333,8 +360,8 @@ const DartBoard = () => {
 					type="button"
 					onClick={() => nextPlayer()}
 					disabled={
-						g.darts.length !== g.dartsPerRound ||
-						g.currentPlayerIndex === g.players.length - 1
+						game.darts.length !== game.dartsPerRound ||
+						game.currentPlayerIndex === game.players.length - 1
 					}
 				>
 					Next player
@@ -343,8 +370,8 @@ const DartBoard = () => {
 					type="button"
 					onClick={() => nextRound()}
 					disabled={
-						g.darts.length !== g.dartsPerRound ||
-						g.currentPlayerIndex < g.players.length - 1
+						game.darts.length !== game.dartsPerRound ||
+						game.currentPlayerIndex < game.players.length - 1
 					}
 				>
 					Next round
@@ -365,7 +392,7 @@ const DartBoard = () => {
 					type="button"
 					variant="destructive"
 					size="sm"
-					onClick={() => g.resetPlayers()}
+					onClick={() => game.resetPlayers()}
 				>
 					Reset players
 				</Button>
@@ -373,7 +400,7 @@ const DartBoard = () => {
 					type="button"
 					variant="destructive"
 					size="sm"
-					onClick={() => g.resetGame()}
+					onClick={() => game.resetGame()}
 				>
 					Reset game
 				</Button>

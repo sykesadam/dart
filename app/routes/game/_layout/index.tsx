@@ -28,4 +28,5 @@ const GamePage = () => {
 
 export const Route = createFileRoute('/game/_layout/')({
 	component: GamePage,
+	ssr: false, // Perhaps I can use route loader to avoid flash somehow?
 })
