@@ -1,0 +1,114 @@
+@import 'tailwindcss';
+
+@source "./app/components/**/*.tsx";
+@source "./app/routes/**/*.tsx";
+
+@plugin "tailwindcss-animate";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+	--radius-lg: 0.5rem;
+	--radius-md: calc(var(--radius-lg) - 2px);
+	--radius-sm: calc(var(--radius-lg) - 4px);
+
+	--color-background: hsl(0 0% 100%);
+	--color-foreground: hsl(222.2 47.4% 11.2%);
+
+	--color-muted: hsl(210 40% 96.1%);
+	--color-muted-foreground: hsl(215.4 16.3% 46.9%);
+
+	--color-popover: hsl(0 0% 100%);
+	--color-popover-foreground: hsl(222.2 47.4% 11.2%);
+
+	--color-border: hsl(214.3 31.8% 91.4%);
+	--color-input: hsl(214.3 31.8% 91.4%);
+
+	--color-card: hsl(0 0% 100%);
+	--color-card-foreground: hsl(222.2 47.4% 11.2%);
+
+	--color-primary: hsl(222.2 47.4% 11.2%);
+	--color-primary-foreground: hsl(210 40% 98%);
+
+	--color-secondary: hsl(210 40% 96.1%);
+	--color-secondary-foreground: hsl(222.2 47.4% 11.2%);
+
+	--color-accent: hsl(210 40% 96.1%);
+	--color-accent-foreground: hsl(222.2 47.4% 11.2%);
+
+	--color-destructive: hsl(0 100% 50%);
+	--color-destructive-foreground: hsl(210 40% 98%);
+
+	--color-ring: hsl(215 20.2% 65.1%);
+
+	--animate-accordion-down: accordion-down 0.2s ease-out;
+	--animate-accordion-up: accordion-up 0.2s ease-out;
+
+	@keyframes accordion-down {
+		from {
+			height: 0;
+		}
+		to {
+			height: var(--radix-accordion-content-height);
+		}
+	}
+
+	@keyframes accordion-up {
+		from {
+			height: var(--radix-accordion-content-height);
+		}
+		to {
+			height: 0;
+		}
+	}
+}
+
+@layer base {
+	.dark {
+		--color-background: hsl(0 0% 100%);
+		--color-foreground: hsl(213 31% 91%);
+
+		--color-muted: hsl(223 47% 11%);
+		--color-muted-foreground: hsl(215.4 16.3% 56.9%);
+
+		--color-accent: hsl(216 34% 17%);
+		--color-accent-foreground: hsl(210 40% 98%);
+
+		--color-popover: hsl(224 71% 4%);
+		--color-popover-foreground: hsl(215 20.2% 65.1%);
+
+		--color-border: hsl(216 34% 17%);
+		--color-input: hsl(216 34% 17%);
+
+		--color-card: hsl(224 71% 4%);
+		--color-card-foreground: hsl(213 31% 91%);
+
+		--color-primary: hsl(210 40% 98%);
+		--color-primary-foreground: hsl(222.2 47.4% 1.2%);
+
+		--color-secondary: hsl(222.2 47.4% 11.2%);
+		--color-secondary-foreground: hsl(210 40% 98%);
+
+		--color-destructive: hsl(0 63% 31%);
+		--color-destructive-foreground: hsl(210 40% 98%);
+
+		--color-ring: hsl(216 34% 17%);
+	}
+
+	* {
+		@apply border-border;
+	}
+
+	body {
+		@apply bg-background text-foreground;
+	}
+}
+
+@layer components {
+	.container {
+		margin-left: auto;
+		margin-right: auto;
+		max-width: 1400px;
+		padding-inline: 2rem;
+	}
+}
