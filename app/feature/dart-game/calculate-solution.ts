@@ -6,14 +6,6 @@ type DartThrow = {
 type Solution = DartThrow[]
 type Solutions = Solution[]
 
-type DartGame = {
-	findSolutions: (targetScore: number, maxDarts?: number) => Solutions
-	getWinningThrows: (
-		targetScore: number,
-		maxDarts?: number,
-	) => string | undefined
-}
-
 // Singles: 1-20
 const singles = Array.from({ length: 20 }, (_, i) => i + 1)
 

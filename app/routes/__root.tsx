@@ -9,7 +9,6 @@ import {
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import { Body, Head, Html, Meta, Scripts } from '@tanstack/start'
 import * as React from 'react'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 export const Route = createRootRoute({
 	meta: () => [
@@ -54,7 +53,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				{children}
 				<ScrollRestoration />
 				<TanStackRouterDevtools position="bottom-right" />
-				<ReactQueryDevtools buttonPosition="bottom-left" />
 				<Scripts />
 			</Body>
 		</Html>

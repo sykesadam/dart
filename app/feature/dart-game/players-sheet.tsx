@@ -7,7 +7,7 @@ import {
 	SheetTitle,
 	SheetDescription,
 } from '@/components/ui/sheet'
-import { useDartGame } from '../store/useDartGame'
+import { useDartGame } from '../store/useDartStore'
 import { getRouteApi, useRouter } from '@tanstack/react-router'
 
 const routeApi = getRouteApi('/game/_layout')

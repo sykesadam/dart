@@ -1,9 +1,9 @@
-import { getWinningThrows } from '@/calculate-solution'
+import { getWinningThrows } from '@/feature/dart-game/calculate-solution'
 import { cn } from '@/lib/utils'
 import { Link } from '@tanstack/react-router'
 import { useRef, useState } from 'react'
 import { Button, buttonVariants } from '../../components/ui/button'
-import { useDartGame } from '../store/useDartGame'
+import { useDartStore } from '../store/useDartStore'
 import { SectionType } from '../types'
 
 type HoveredSection =
@@ -167,7 +167,7 @@ const getDartPoint = (point: string) => {
 const DartBoard = () => {
 	const [hoveredSection, setHoveredSection] = useState<HoveredSection>(null)
 	const dartBoard = useRef<SVGSVGElement | null>(null)
-	const game = useDartGame()
+	const game = useDartStore()
 
 	const remainingDarts = game.dartsPerRound - game.darts.length
 	const dartsLeftContent =

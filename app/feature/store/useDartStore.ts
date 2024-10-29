@@ -166,7 +166,7 @@ const createRoundSlice: StateCreator<
 	},
 })
 
-export const useDartGame = create<PlayersSlice & RoundsSlice>()(
+export const useDartStore = create<PlayersSlice & RoundsSlice>()(
 	persist(
 		(...a) => ({
 			...createPlayersSlice(...a),

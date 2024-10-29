@@ -1,37 +1,40 @@
-import * as fs from 'fs'
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/start'
-import DartBoard from '@/feature/dart-game/dart-board'
-import { useDartGame } from '@/feature/store/useDartGame'
-import { PlayersSheet } from '@/feature/dart-game/players-sheet'
 import { buttonVariants } from '@/components/ui/button'
-
-const filePath = 'count.txt'
-
-async function readCount() {
-	return parseInt(
-		await fs.promises.readFile(filePath, 'utf-8').catch(() => '0'),
-	)
-}
-
-const getCount = createServerFn('GET', () => {
-	return readCount()
-})
-
-const updateCount = createServerFn('POST', async (addBy: number) => {
-	const count = await readCount()
-	await fs.promises.writeFile(filePath, `${count + addBy}`)
-})
+import { currentUser } from '@/feature/auth/actions'
+import { createFileRoute, Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/')({
 	component: Home,
-	loader: async () => await getCount(),
+	loader: async () => currentUser(),
 })
 
 function Home() {
+	const user = Route.useLoaderData()
+
+	console.log(user)
+
 	return (
 		<div className="container bg-amber-100 p-4">
 			Start screen
+			<div className="my-8">
+				{user ? (
+					<>
+						<span className="mr-2">{user.email}</span>
+						<Link
+							to="/logout"
+							className={buttonVariants({ variant: 'secondary' })}
+						>
+							Logout
+						</Link>
+					</>
+				) : (
+					<Link
+						to="/login"
+						className={buttonVariants({ variant: 'secondary' })}
+					>
+						Login
+					</Link>
+				)}
+			</div>
 			<div>
 				<Link to="/game" className={buttonVariants()}>
 					Start a game
