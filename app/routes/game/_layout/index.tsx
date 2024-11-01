@@ -1,10 +1,10 @@
 import { buttonVariants } from '@/components/ui/button'
 import DartBoard from '@/feature/dart-game/dart-board'
-import { useDartGame } from '@/feature/store/useDartStore'
+import { useDartStore } from '@/feature/store/useDartStore'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 const GamePage = () => {
-	const game = useDartGame()
+	const game = useDartStore()
 
 	if (!game.currentPlayer()) {
 		return (

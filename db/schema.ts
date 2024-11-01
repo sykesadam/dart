@@ -1,8 +1,11 @@
+import { sql } from 'drizzle-orm'
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
-export const usersTable = sqliteTable('users_table', {
+export const users = sqliteTable('users', {
 	id: int().primaryKey({ autoIncrement: true }),
 	email: text().notNull(),
 	password: text().notNull(),
+	role: text().$type<'user' | 'admin'>().default('user'),
+	createdAt: text().default(sql`(CURRENT_TIMESTAMP)`),
 })
-export type User = typeof usersTable.$inferSelect
+export type User = typeof users.$inferSelect

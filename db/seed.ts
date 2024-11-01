@@ -1,14 +1,14 @@
 import { db } from 'db'
-import { usersTable } from './schema'
+import { users } from './schema'
 
 async function main() {
-	const user: typeof usersTable.$inferInsert = {
+	const user: typeof users.$inferInsert = {
 		email: 'john@example.com',
 		password: 'penis',
 	}
-	await db.insert(usersTable).values(user)
+	await db.insert(users).values(user)
 	console.log('New user created!')
-	const users = await db.select().from(usersTable)
+	const users = await db.select().from(users)
 	console.log('Getting all users from the database: ', users)
 	/*
   const users: {

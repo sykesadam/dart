@@ -7,7 +7,7 @@ import {
 	SheetTitle,
 	SheetDescription,
 } from '@/components/ui/sheet'
-import { useDartGame } from '../store/useDartStore'
+import { useDartStore } from '../store/useDartStore'
 import { getRouteApi, useRouter } from '@tanstack/react-router'
 
 const routeApi = getRouteApi('/game/_layout')
@@ -16,10 +16,10 @@ export const PlayersSheet = () => {
 	const { playersSheet } = routeApi.useSearch()
 	const router = useRouter()
 
-	const players = useDartGame((state) => state.players)
-	const addPlayer = useDartGame((state) => state.addPlayer)
-	const removePlayer = useDartGame((state) => state.removePlayer)
-	const currentPlayerScore = useDartGame((state) => state.currentPlayerScore)
+	const players = useDartStore((state) => state.players)
+	const addPlayer = useDartStore((state) => state.addPlayer)
+	const removePlayer = useDartStore((state) => state.removePlayer)
+	const currentPlayerScore = useDartStore((state) => state.currentPlayerScore)
 
 	const onAddPlayer = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()

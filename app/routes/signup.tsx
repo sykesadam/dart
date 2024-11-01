@@ -3,7 +3,7 @@ import { hashPassword } from '@/feature/auth/utils'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { createServerFn, useServerFn } from '@tanstack/start'
 import { db } from 'db'
-import { usersTable } from 'db/schema'
+import { users } from 'db/schema'
 import { eq } from 'drizzle-orm'
 import { useMutation } from '@/hooks/useMutation'
 import { Auth } from '@/feature/auth/components/auth-container'
@@ -17,8 +17,8 @@ export const signupFn = createServerFn(
 	}) => {
 		const found = await db
 			.select()
-			.from(usersTable)
-			.where(eq(usersTable.email, payload.email))
+			.from(users)
+			.where(eq(users.email, payload.email))
 			.get()
 
 		// Encrypt the password using Sha256 into plaintext
@@ -49,7 +49,7 @@ export const signupFn = createServerFn(
 
 		// Create the user
 		const user = await db
-			.insert(usersTable)
+			.insert(users)
 			.values({ email: payload.email, password })
 			.returning()
 			.get()

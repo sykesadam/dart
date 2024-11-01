@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/start'
 import { db } from 'db'
-import { usersTable } from 'db/schema'
+import { users } from 'db/schema'
 import crypto from 'node:crypto'
 import { eq } from 'drizzle-orm'
 import { useAppSession } from './session'
@@ -23,8 +23,8 @@ export const loginFn = createServerFn(
 		// Find the user
 		const user = await db
 			.select()
-			.from(usersTable)
-			.where(eq(usersTable.email, payload.email))
+			.from(users)
+			.where(eq(users.email, payload.email))
 			.get()
 
 		// Check if the user exists
