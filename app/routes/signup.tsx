@@ -42,9 +42,9 @@ export const signupFn = createServerFn(
 			})
 
 			// Redirect to the prev page stored in the "redirect" search param
-			throw redirect({
-				href: payload.redirectUrl || '/',
-			})
+			// throw redirect({
+			// 	href: payload.redirectUrl || '/',
+			// })
 		}
 
 		// Create the user
@@ -60,9 +60,9 @@ export const signupFn = createServerFn(
 		})
 
 		// Redirect to the prev page stored in the "redirect" search param
-		throw redirect({
-			href: payload.redirectUrl || '/',
-		})
+		// throw redirect({
+		// 	href: payload.redirectUrl || '/',
+		// })
 	},
 )
 
@@ -76,24 +76,27 @@ function SignupPage() {
 	})
 
 	return (
-		<Auth
-			actionText="Sign Up"
-			status={signupMutation.status}
-			onSubmit={(e) => {
-				const formData = new FormData(e.target as HTMLFormElement)
+		<div className="max-w-sm mx-auto px-6 py-24">
+			<h1 className="text-3xl font-bold mb-6 text-center">Sign Up</h1>
+			<Auth
+				actionText="Sign Up"
+				status={signupMutation.status}
+				onSubmit={(e) => {
+					const formData = new FormData(e.target as HTMLFormElement)
 
-				signupMutation.mutate({
-					email: formData.get('email') as string,
-					password: formData.get('password') as string,
-				})
-			}}
-			afterSubmit={
-				signupMutation.data?.error ? (
-					<>
-						<div className="text-red-400">{signupMutation.data.message}</div>
-					</>
-				) : null
-			}
-		/>
+					signupMutation.mutate({
+						email: formData.get('email') as string,
+						password: formData.get('password') as string,
+					})
+				}}
+				afterSubmit={
+					signupMutation.data?.error ? (
+						<>
+							<div className="text-red-400">{signupMutation.data.message}</div>
+						</>
+					) : null
+				}
+			/>
+		</div>
 	)
 }

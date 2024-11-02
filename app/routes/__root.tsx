@@ -31,7 +31,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 				title: 'TanStack Start Starter',
 			},
 		],
-
 		links: () => [{ rel: 'stylesheet', href: globalCss }],
 		errorComponent: (props) => {
 			return (
@@ -64,7 +63,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 	const { data: currentUser } = useSuspenseQuery(currentUserQueryOptions())
 
 	return (
-		<Html>
+		<Html className="dark">
 			<Head>
 				<Meta />
 			</Head>

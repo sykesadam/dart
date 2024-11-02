@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/start'
-import { db } from 'db'
+import { createMatchWithRounds, db } from 'db'
 import { users } from 'db/schema'
 import { eq } from 'drizzle-orm'
 import { useAppSession } from './session'
@@ -38,3 +38,35 @@ export const currentUserQueryOptions = () =>
 	})
 
 export type CurrentUser = Awaited<ReturnType<typeof currentUser>>
+
+export const createMatch = createServerFn('POST', async () => {
+	const session = await useAppSession()
+
+	if (!session.data.id) {
+		return null
+	}
+
+	await createMatchWithRounds(session.data.id, [
+		{
+			round: 1,
+			score: 0,
+		},
+	])
+})
+
+export const saveRoundToDb = createServerFn(
+	'POST',
+	async (round: { round: number; score: number }) => {
+		const session = await useAppSession()
+
+		if (!session.data.id) {
+			return null
+		}
+
+		await db.insert(matchRounds).values({
+			match_id: round.matchId,
+			round: round.round,
+			score: round.score,
+		})
+	},
+)

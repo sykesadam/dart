@@ -118,8 +118,19 @@ const createRoundSlice: StateCreator<
 			return { darts: [...state.darts, dart], currentPlayerRoundScore }
 		}),
 	removeDart: (x: number, y: number) => {
+		const remainingDarts = get().darts.filter(
+			(dart) => dart.x !== x && dart.y !== y,
+		)
+
+		if (!remainingDarts) return
+
+		const currentPlayerRoundScore = remainingDarts.reduce((prev, acc) => {
+			return prev + acc.points
+		}, 0)
+
 		set((state) => ({
 			darts: state.darts.filter((dart) => dart.x !== x && dart.y !== y),
+			currentPlayerRoundScore,
 		}))
 	},
 	savePlayerRound: () => {

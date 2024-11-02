@@ -244,6 +244,8 @@ const DartBoard = () => {
 		e.stopPropagation()
 
 		game.removeDart(x, y)
+
+		console.log('darts', game.darts)
 	}
 
 	return (

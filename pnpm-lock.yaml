@@ -86,6 +86,9 @@ importers:
       vinxi:
         specifier: ^0.4.3
         version: 0.4.3(@libsql/client@0.14.0)(@types/node@22.8.1)(drizzle-orm@0.36.0(@libsql/client-wasm@0.14.0)(@libsql/client@0.14.0)(@types/react@18.3.12)(react@18.3.1))(ioredis@5.4.1)(lightningcss@1.27.0)(terser@5.36.0)
+      zod:
+        specifier: ^3.23.8
+        version: 3.23.8
       zustand:
         specifier: ^5.0.1
         version: 5.0.1(@types/react@18.3.12)(react@18.3.1)(use-sync-external-store@1.2.2(react@18.3.1))

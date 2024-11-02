@@ -14,15 +14,16 @@ import {
 import { CurrentUser } from '@/feature/auth/current-user'
 import { Link } from '@tanstack/react-router'
 import { buttonVariants } from './ui/button'
+import { LoginButton } from './login-button'
 
 export function Header({ currentUser }: { currentUser: CurrentUser }) {
 	return (
 		<header className="border-b">
 			<div className="container flex h-16 items-center gap-4">
 				<div className="flex flex-1 items-center">
-					{/* <Link to="/"> */}
-					<div className="font-bold text-xl">Logo</div>
-					{/* </Link> */}
+					<Link to="/">
+						<div className="font-bold text-xl">Logo</div>
+					</Link>
 				</div>
 
 				<NavigationMenu>
@@ -55,12 +56,9 @@ export function Header({ currentUser }: { currentUser: CurrentUser }) {
 					</DropdownMenu>
 				) : (
 					<div className="flex gap-2">
-						<Link
-							to="/login"
-							className={buttonVariants({ variant: 'default' })}
-						>
+						<LoginButton className={buttonVariants({ variant: 'default' })}>
 							Login
-						</Link>
+						</LoginButton>
 						<Link
 							to="/signup"
 							className={buttonVariants({ variant: 'outline' })}

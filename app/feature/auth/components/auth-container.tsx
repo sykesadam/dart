@@ -1,3 +1,7 @@
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+
 export function Auth({
 	actionText,
 	onSubmit,
@@ -10,48 +14,32 @@ export function Auth({
 	afterSubmit?: React.ReactNode
 }) {
 	return (
-		<div className="fixed inset-0 bg-white dark:bg-black flex items-start justify-center p-8">
-			<div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-lg">
-				<h1 className="text-2xl font-bold mb-4">{actionText}</h1>
-				<form
-					onSubmit={(e) => {
-						e.preventDefault()
-						onSubmit(e)
-					}}
-					className="space-y-4"
+		<div className="">
+			<form
+				onSubmit={(e) => {
+					e.preventDefault()
+					onSubmit(e)
+				}}
+				className="space-y-6"
+			>
+				<div className="grid w-full items-center gap-1.5">
+					<Label htmlFor="email">Email</Label>
+					<Input type="email" name="email" id="email" />
+				</div>
+				<div className="grid w-full items-center gap-1.5">
+					<Label htmlFor="password">Password</Label>
+					<Input type="password" id="password" name="password" />
+				</div>
+				<Button
+					type="submit"
+					size="lg"
+					className="w-full"
+					disabled={status === 'pending'}
 				>
-					<div>
-						<label htmlFor="email" className="block text-xs">
-							Username
-						</label>
-						<input
-							type="email"
-							name="email"
-							id="email"
-							className="px-2 py-1 w-full rounded border border-gray-500/20 bg-white dark:bg-gray-800"
-						/>
-					</div>
-					<div>
-						<label htmlFor="password" className="block text-xs">
-							Password
-						</label>
-						<input
-							type="password"
-							name="password"
-							id="password"
-							className="px-2 py-1 w-full rounded border border-gray-500/20 bg-white dark:bg-gray-800"
-						/>
-					</div>
-					<button
-						type="submit"
-						className="w-full bg-cyan-600 text-white rounded py-2 font-black uppercase"
-						disabled={status === 'pending'}
-					>
-						{status === 'pending' ? '...' : actionText}
-					</button>
-					{afterSubmit ? afterSubmit : null}
-				</form>
-			</div>
+					{status === 'pending' ? '...' : actionText}
+				</Button>
+				{afterSubmit ? afterSubmit : null}
+			</form>
 		</div>
 	)
 }

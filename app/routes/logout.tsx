@@ -6,13 +6,16 @@ const logoutFn = createServerFn('POST', async () => {
 	const session = await useAppSession()
 
 	session.clear()
-
-	throw redirect({
-		href: '/',
-	})
 })
 
 export const Route = createFileRoute('/logout')({
 	preload: false,
-	loader: () => logoutFn(),
+	loader: async ({ context }) => {
+		await logoutFn()
+		context.queryClient.invalidateQueries()
+
+		throw redirect({
+			href: '/',
+		})
+	},
 })
